@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <Routes>
       <Route index element={<ProjectChoice />}></Route>
-      <Route path=':project-id' element={<Project />} />
+      <Route path=':projectId' element={<Project />} />
     </Routes>
   );
 };
