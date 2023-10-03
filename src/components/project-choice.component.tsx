@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import css from 'styled-jsx/macro';
-import { PROJECTS_DATA } from '../projects-data';
+// import { PROJECTS_DATA } from '../projects-data';
+import { useStore } from '../store/store';
 import {
   addCollectionAndDocuments,
   getProjectsAndDocuments
@@ -11,7 +12,10 @@ const ProjectChoice = () => {
   // useEffect(() => {
   //   addCollectionAndDocuments('projects', PROJECTS_DATA);
   // }, []);
-  useEffect(() => {}, []);
+  const { fetchProjectsStart, projects, projectsIsLoading } = useStore();
+  useEffect(() => {
+    fetchProjectsStart();
+  }, []);
   const { className, styles } = css.resolve`
     main {
       display: flex;
@@ -29,11 +33,15 @@ const ProjectChoice = () => {
   return (
     <main className={className}>
       <h1 className={className}>Проекты</h1>
-      <ul className={className}>
-        {PROJECTS_DATA.map((project) => (
-          <ProjectCard key={project.title} project={project} />
-        ))}
-      </ul>
+      {projectsIsLoading ? (
+        'Загрузка...'
+      ) : (
+        <ul className={className}>
+          {projects.map((project) => (
+            <ProjectCard key={project.title} project={project} />
+          ))}
+        </ul>
+      )}
       {styles}
     </main>
   );
