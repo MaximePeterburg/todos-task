@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import css from 'styled-jsx/macro';
 // import { PROJECTS_DATA } from '../projects-data';
 import { useStore } from '../store/store';
-import {
-  addCollectionAndDocuments,
-  getProjectsAndDocuments
-} from '../utils/firebase/firebase.utils';
+// import {
+//   addCollectionAndDocuments,
+//   getProjectsAndDocuments
+// } from '../utils/firebase/firebase.utils';
 import ProjectCard from './project-card.component';
 
 const ProjectChoice = () => {
