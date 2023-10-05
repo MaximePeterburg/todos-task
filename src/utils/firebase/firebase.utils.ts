@@ -10,6 +10,7 @@ import {
   updateDoc,
   writeBatch
 } from 'firebase/firestore';
+import { ProjectItem } from '../../store/projects/projects.types';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAp3LQgXIb2vPLjFmleCSZlOcR7hkcIboM',
@@ -27,10 +28,6 @@ const db = getFirestore();
 export type ObjectToAdd = {
   title: string;
 };
-export type Project = {
-  title: string;
-  description: string;
-};
 
 export const addCollectionAndDocuments = async <T extends ObjectToAdd>(
   collectionKey: string,
@@ -46,13 +43,18 @@ export const addCollectionAndDocuments = async <T extends ObjectToAdd>(
   console.log('done');
 };
 
-export const getProjectsAndDocuments = async (): Promise<Project[]> => {
+export const getProjectsAndDocuments = async (): Promise<ProjectItem[]> => {
   const collectionRef = collection(db, 'projects');
   const q = query(collectionRef);
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((docSnapshot) => docSnapshot.data() as Project);
+  return querySnapshot.docs.map((docSnapshot) => docSnapshot.data() as ProjectItem);
 };
 
-// export const getProjectAndDocuments = async (id:number):Promise<>=>{
-
-// }
+export const getProjectDocument = async (title: string): Promise<ProjectItem> => {
+  const collectionRef = collection(db, 'projects');
+  const q = query(collectionRef);
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs
+    .map((docSnapshot) => docSnapshot.data())
+    .find((project) => project.title === title) as ProjectItem;
+};

@@ -1,13 +1,13 @@
 import { AnyAction } from 'redux';
-import { Project } from '../../utils/firebase/firebase.utils';
 import {
   fetchProjectsFailed,
   fetchProjectsStart,
   fetchProjectsSuccess
 } from './projects.action';
+import { ProjectItem } from './projects.types';
 
 export type ProjectsState = {
-  readonly projects: Project[];
+  readonly projects: ProjectItem[];
   readonly isLoading: boolean;
   readonly error: Error | null;
 };

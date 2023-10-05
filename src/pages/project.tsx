@@ -1,14 +1,7 @@
-import { DndContext } from '@dnd-kit/core';
+import ProjectContainer from '../components/project-container.component';
 
 const Project = () => {
-  return (
-    <div>
-      Project
-      <DndContext>
-        
-      </DndContext>
-    </div>
-  );
+  return <ProjectContainer />;
 };
 
 export default Project;

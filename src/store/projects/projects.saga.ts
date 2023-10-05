@@ -13,7 +13,7 @@ export function* fetchProjectsAsync() {
 }
 
 export function* onFetchProjects() {
-  yield* takeLatest(PROJECTS_ACTION_TYPES.FETCH_CATEGORIES_START, fetchProjectsAsync);
+  yield* takeLatest(PROJECTS_ACTION_TYPES.FETCH_PROJECTS_START, fetchProjectsAsync);
 }
 
 export function* projectsSaga() {
