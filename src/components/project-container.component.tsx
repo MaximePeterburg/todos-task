@@ -45,6 +45,11 @@ const ProjectContainer = () => {
       gap: 1rem;
       padding: 2rem;
     }
+    div {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
   `;
   return (
     <>

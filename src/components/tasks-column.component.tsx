@@ -1,6 +1,7 @@
 import { MouseEventHandler, useRef } from 'react';
 import css from 'styled-jsx/macro';
 import { TASK_STATUS } from '../store/projects/projects.types';
+import TaskForm from './task-form.component';
 type TasksColumnProps = {
   taskStatus: TASK_STATUS;
 };
@@ -35,6 +36,11 @@ const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
     button:hover {
       background: linear-gradient(135deg, #ffd700, #ffa500, #ff6347, #ff4500);
     }
+    dialog {
+      position: absolute;
+      top: 50%;
+      left: 35%;
+    }
   `;
   return (
     <div>
@@ -45,7 +51,9 @@ const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
       <button className={className} onClick={handleButtonClick}>
         + Добавить
       </button>
-      <dialog ref={modalRef} onClick={handleBackdropClick}></dialog>
+      <dialog className={className} ref={modalRef} onClick={handleBackdropClick}>
+        <TaskForm />
+      </dialog>
       {styles}
     </div>
   );

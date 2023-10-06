@@ -11,9 +11,9 @@ export enum PRIORITY_LEVELS {
 }
 
 export enum TASK_STATUS {
-  QUEUE = 'Queue',
-  DEVELOPMENT = 'Development',
-  DONE = 'Done'
+  QUEUE = 'В очереди',
+  DEVELOPMENT = 'В работе',
+  DONE = 'Завершено'
 }
 
 export type ProjectItem = {
