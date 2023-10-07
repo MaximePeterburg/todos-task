@@ -1,12 +1,26 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import css from 'styled-jsx/macro';
-import { PRIORITY_LEVELS } from '../store/projects/projects.types';
+import { PRIORITY_LEVELS, TASK_STATUS } from '../store/projects/projects.types';
+import { useStore } from '../store/store';
+import { ProjectRouteParams } from './project-container.component';
 import Button from './ui-kit/button.component';
 import FormInput from './ui-kit/form-input.component';
 
-const TaskForm = () => {
+type TasksFormProps = {
+  taskStatus: TASK_STATUS;
+};
+
+const TaskForm = ({ taskStatus }: TasksFormProps) => {
   const [title, setTitle] = useState('');
-  const [selectedOption, setSelectedOption] = useState(PRIORITY_LEVELS.MEDIUM);
+  const [description, setDescription] = useState('');
+  const [selectedPriorityOption, setSelectedPriorityOption] = useState(
+    PRIORITY_LEVELS.MEDIUM
+  );
+
+  const { addTaskStart } = useStore();
+
+  const { projectId } = useParams<keyof ProjectRouteParams>() as ProjectRouteParams;
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -15,8 +29,33 @@ const TaskForm = () => {
 
   const handlePriorityChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    setSelectedOption(value as PRIORITY_LEVELS);
+    setSelectedPriorityOption(value as PRIORITY_LEVELS);
   };
+
+  const handleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target;
+    setDescription(value);
+  };
+
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      const createdAt = new Date();
+
+      const taskAddedToProject = {
+        taskItem: {
+          title,
+          description,
+          priority: selectedPriorityOption,
+          status: taskStatus,
+          createdAt
+        },
+        projectId
+      };
+      addTaskStart(taskAddedToProject);
+    },
+    [addTaskStart]
+  );
 
   const { className, styles } = css.resolve`
     form {
@@ -55,7 +94,7 @@ const TaskForm = () => {
     }
   `;
   return (
-    <form className={className}>
+    <form onSubmit={handleSubmit} className={className}>
       <h1 className={className}>Добавить задачу</h1>
 
       <FormInput value={title} onChange={handleTitleChange} label='Название' />
@@ -64,7 +103,7 @@ const TaskForm = () => {
         <label className={className}>Приоритет</label>
         <select
           onChange={handlePriorityChange}
-          value={selectedOption}
+          value={selectedPriorityOption}
           className={className}>
           <option className={className} value={PRIORITY_LEVELS.LOW}>
             Низкий
@@ -79,10 +118,16 @@ const TaskForm = () => {
       </div>
       <div className={className}>
         <label className={className}>Описание</label>
-        <textarea className={className} />
+        <textarea
+          value={description}
+          onChange={handleDescriptionChange}
+          className={className}
+        />
         {styles}
       </div>
-      <Button isLoading={title.length === 0}>Создать</Button>
+      <Button type='submit' isLoading={title.length === 0 || description.length === 0}>
+        Создать
+      </Button>
     </form>
   );
 };

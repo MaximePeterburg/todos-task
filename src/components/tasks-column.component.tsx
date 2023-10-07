@@ -1,15 +1,23 @@
 import { MouseEventHandler, useRef } from 'react';
 import css from 'styled-jsx/macro';
 import { TASK_STATUS } from '../store/projects/projects.types';
+import { useStore } from '../store/store';
+import TaskCard from './task-card.component';
 import TaskForm from './task-form.component';
+
 type TasksColumnProps = {
   taskStatus: TASK_STATUS;
 };
+
 const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
+  const { tasks } = useStore();
+  const tasksToRender = tasks.filter((task) => task.status === taskStatus);
+
   const handleButtonClick = () => {
     modalRef.current?.showModal();
   };
+
   const handleBackdropClick: MouseEventHandler<HTMLDialogElement> = (e) => {
     if (modalRef.current) {
       const modalDimensions = modalRef.current.getBoundingClientRect();
@@ -23,9 +31,18 @@ const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
       }
     }
   };
+
   const { className, styles } = css.resolve`
+    section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
     div {
       min-width: 15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
     button {
       width: 100%;
@@ -38,24 +55,28 @@ const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
     }
     dialog {
       position: absolute;
-      top: 50%;
+      top: 20%;
       left: 35%;
     }
   `;
   return (
-    <div>
+    <section className={className}>
       <header>
         <h3>{taskStatus}</h3>
       </header>
-      <div className={className}></div>
+      <div className={className}>
+        {tasksToRender.map((task) => (
+          <TaskCard key={task.createdAt.toString()} taskItem={task} />
+        ))}
+      </div>
       <button className={className} onClick={handleButtonClick}>
         + Добавить
       </button>
       <dialog className={className} ref={modalRef} onClick={handleBackdropClick}>
-        <TaskForm />
+        <TaskForm taskStatus={taskStatus} />
       </dialog>
       {styles}
-    </div>
+    </section>
   );
 };
 
