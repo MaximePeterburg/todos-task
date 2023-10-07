@@ -2,7 +2,11 @@ import createSagaMiddleware from '@redux-saga/core';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Middleware, applyMiddleware, compose, createStore } from 'redux';
 import logger from 'redux-logger';
-import { fetchProjectStart } from './project/project.action';
+import {
+  TaskItemAddedToProject,
+  addTaskStart,
+  fetchProjectStart
+} from './project/project.action';
 import { fetchProjectsStart } from './projects/projects.action';
 import { rootReducer } from './root-reducer';
 import { rootSaga } from './root-saga';
@@ -51,6 +55,7 @@ export const useStore = () => {
   const projectIsLoading = useTypedSelector(
     (state: RootState) => state.project.isLoading
   );
+  const tasks = useTypedSelector((state: RootState) => state.project.project.tasks);
 
   return {
     projects,
@@ -59,6 +64,9 @@ export const useStore = () => {
 
     project,
     projectIsLoading,
-    fetchProjectStart: (title: string) => dispatch(fetchProjectStart(title))
+    tasks,
+    fetchProjectStart: (title: string) => dispatch(fetchProjectStart(title)),
+    addTaskStart: (taskAddedToProject: TaskItemAddedToProject) =>
+      dispatch(addTaskStart(taskAddedToProject))
   };
 };

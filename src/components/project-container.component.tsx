@@ -6,7 +6,7 @@ import { TASK_STATUS } from '../store/projects/projects.types';
 import { useStore } from '../store/store';
 import TasksColumn from './tasks-column.component';
 
-type ProjectRouteParams = {
+export type ProjectRouteParams = {
   projectId: string;
 };
 

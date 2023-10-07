@@ -19,6 +19,8 @@ export enum TASK_STATUS {
 export type ProjectItem = {
   title: string;
   description: string;
+  tasks: TaskItem[];
+  // tasksNumber: number;
 };
 
 export type SubtaskItem = {
@@ -37,15 +39,15 @@ export type CommentaryItem = {
 };
 
 export type TaskItem = {
-  id: string;
+  // id: string;
   title: string;
   description: string;
   createdAt: Date;
-  spentTime: string;
-  finishedAt: Date;
+  // spentTime: string;
+  // finishedAt: Date;
   priority: PRIORITY_LEVELS;
-  addedFiles: string;
   status: TASK_STATUS;
-  subtasks: SubtaskItem;
-  commentaries: CommentaryItem[];
+  // addedFiles: string;
+  subtasks?: SubtaskItem;
+  commentaries?: CommentaryItem[];
 };

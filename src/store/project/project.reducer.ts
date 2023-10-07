@@ -13,7 +13,7 @@ export type ProjectState = {
 };
 
 export const PROJECT_INITIAL_STATE: ProjectState = {
-  project: { title: '', description: '' },
+  project: { title: '', description: '', tasks: [] },
   isLoading: false,
   error: null
 };
