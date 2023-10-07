@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import {
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -10,6 +11,7 @@ import {
   updateDoc,
   writeBatch
 } from 'firebase/firestore';
+import { TaskItemAddedToProject } from '../../store/project/project.action';
 import { ProjectItem } from '../../store/projects/projects.types';
 
 const firebaseConfig = {
@@ -57,4 +59,18 @@ export const getProjectDocument = async (title: string): Promise<ProjectItem> =>
   return querySnapshot.docs
     .map((docSnapshot) => docSnapshot.data())
     .find((project) => project.title === title) as ProjectItem;
+};
+
+export const addTaskToDocument = async ({
+  projectId,
+  taskItem
+}: TaskItemAddedToProject) => {
+  const projectDocRef = doc(collection(db, 'projects'), projectId);
+  try {
+    await updateDoc(projectDocRef, {
+      tasks: arrayUnion(taskItem)
+    });
+  } catch (error) {
+    console.log('error adding task item to an array', error);
+  }
 };
