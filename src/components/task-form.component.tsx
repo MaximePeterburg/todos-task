@@ -48,7 +48,8 @@ const TaskForm = ({ taskStatus }: TasksFormProps) => {
           description,
           priority: selectedPriorityOption,
           status: taskStatus,
-          createdAt
+          createdAt,
+          id: createdAt.toString()
         },
         projectId
       };

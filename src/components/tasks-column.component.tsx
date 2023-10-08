@@ -1,7 +1,19 @@
-import { MouseEventHandler, useRef } from 'react';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  useDroppable
+} from '@dnd-kit/core';
+import { SortableContext } from '@dnd-kit/sortable';
+import { MouseEventHandler, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useParams } from 'react-router-dom';
 import css from 'styled-jsx/macro';
-import { TASK_STATUS } from '../store/projects/projects.types';
+import { TaskItemsInProject } from '../store/project/project.action';
+import { TASK_STATUS, TaskItem } from '../store/projects/projects.types';
 import { useStore } from '../store/store';
+import { ProjectRouteParams } from './project-container.component';
 import TaskCard from './task-card.component';
 import TaskForm from './task-form.component';
 
@@ -10,9 +22,50 @@ type TasksColumnProps = {
 };
 
 const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
+  const { projectId } = useParams<keyof ProjectRouteParams>() as ProjectRouteParams;
   const modalRef = useRef<HTMLDialogElement>(null);
-  const { tasks } = useStore();
+  const { tasks, sortTaskStart } = useStore();
+
+  const { isOver, setNodeRef } = useDroppable({
+    id: taskStatus
+  });
+  const style = {
+    color: isOver ? 'green' : undefined
+  };
+
+  const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
+
+  const onDragStart = (event: DragStartEvent) => {
+    if (event.active.data.current?.type === 'Task') {
+      setActiveTask(event.active.data.current.taskItem);
+      return;
+    }
+  };
+
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    const activeTaskId = active.id;
+    const overTaskId = over.id;
+    if (activeTaskId === overTaskId) return;
+    const activeTaskItem = active.data.current?.taskItem;
+    const overTaskItem = over.data.current?.taskItem;
+    console.log('activeTaskItem', activeTaskItem);
+    console.log('overTaskItem', overTaskItem);
+
+    const tasksToSortAndProject: TaskItemsInProject = {
+      taskItems: [activeTaskItem, overTaskItem],
+      projectId
+    };
+    sortTaskStart(tasksToSortAndProject);
+  };
+
   const tasksToRender = tasks.filter((task) => task.status === taskStatus);
+
+  const tasksToRenderId = useMemo(
+    () => tasksToRender.map((taskToRender) => taskToRender.createdAt.toString()),
+    [tasksToRender]
+  );
 
   const handleButtonClick = () => {
     modalRef.current?.showModal();
@@ -38,7 +91,7 @@ const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
       flex-direction: column;
       gap: 0.5rem;
     }
-    div {
+    ul {
       min-width: 15rem;
       display: flex;
       flex-direction: column;
@@ -64,11 +117,19 @@ const TasksColumn = ({ taskStatus }: TasksColumnProps) => {
       <header>
         <h3>{taskStatus}</h3>
       </header>
-      <div className={className}>
-        {tasksToRender.map((task) => (
-          <TaskCard key={task.createdAt.toString()} taskItem={task} />
-        ))}
-      </div>
+      <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <ul ref={setNodeRef} className={className} style={style}>
+          <SortableContext items={tasksToRenderId}>
+            {tasksToRender.map((task) => (
+              <TaskCard key={task.createdAt.toString()} taskItem={task} />
+            ))}
+          </SortableContext>
+        </ul>
+        {createPortal(
+          <DragOverlay>{activeTask && <TaskCard taskItem={activeTask} />}</DragOverlay>,
+          document.body
+        )}
+      </DndContext>
       <button className={className} onClick={handleButtonClick}>
         + Добавить
       </button>

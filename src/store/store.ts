@@ -3,9 +3,11 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Middleware, applyMiddleware, compose, createStore } from 'redux';
 import logger from 'redux-logger';
 import {
-  TaskItemAddedToProject,
+  TaskItemInProject,
+  TaskItemsInProject,
   addTaskStart,
-  fetchProjectStart
+  fetchProjectStart,
+  sortTaskStart
 } from './project/project.action';
 import { fetchProjectsStart } from './projects/projects.action';
 import { rootReducer } from './root-reducer';
@@ -66,7 +68,12 @@ export const useStore = () => {
     projectIsLoading,
     tasks,
     fetchProjectStart: (title: string) => dispatch(fetchProjectStart(title)),
-    addTaskStart: (taskAddedToProject: TaskItemAddedToProject) =>
-      dispatch(addTaskStart(taskAddedToProject))
+
+    addTaskStart: (taskAddedToProject: TaskItemInProject) =>
+      dispatch(addTaskStart(taskAddedToProject)),
+    sortTaskStart: (taskItemsInProject: TaskItemsInProject) => {
+      console.log('sortTaskStart dispatched');
+      return dispatch(sortTaskStart(taskItemsInProject));
+    }
   };
 };

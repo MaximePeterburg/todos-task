@@ -1,11 +1,13 @@
 import { all, call, put, takeLatest } from 'typed-redux-saga';
 import {
   addTaskToDocument,
-  getProjectDocument
+  getProjectDocument,
+  sortTaskInDocument
 } from '../../utils/firebase/firebase.utils';
 import {
   AddTaskStart,
   FetchProjectStart,
+  SortTaskStart,
   fetchProjectFailed,
   fetchProjectStart,
   fetchProjectSuccess
@@ -20,8 +22,14 @@ export function* fetchProjectAsync({ payload }: FetchProjectStart) {
     yield* put(fetchProjectFailed(error as Error));
   }
 }
+
 export function* addTaskAsync({ payload }: AddTaskStart) {
   yield* call(addTaskToDocument, payload);
+  yield* put(fetchProjectStart(payload.projectId));
+}
+
+export function* sortTaskAsync({ payload }: SortTaskStart) {
+  yield* call(sortTaskInDocument, payload);
   yield* put(fetchProjectStart(payload.projectId));
 }
 
@@ -33,6 +41,10 @@ export function* onAddTask() {
   yield* takeLatest(PROJECT_ACTION_TYPES.ADD_TASK_START, addTaskAsync);
 }
 
+export function* onSortTask() {
+  yield* takeLatest(PROJECT_ACTION_TYPES.SORT_TASK_START, sortTaskAsync);
+}
+
 export function* projectSaga() {
-  yield* all([call(onFetchProject), call(onAddTask)]);
+  yield* all([call(onFetchProject), call(onAddTask), call(onSortTask)]);
 }

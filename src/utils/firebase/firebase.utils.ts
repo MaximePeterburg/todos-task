@@ -11,7 +11,10 @@ import {
   updateDoc,
   writeBatch
 } from 'firebase/firestore';
-import { TaskItemAddedToProject } from '../../store/project/project.action';
+import {
+  TaskItemInProject,
+  TaskItemsInProject
+} from '../../store/project/project.action';
 import { ProjectItem } from '../../store/projects/projects.types';
 
 const firebaseConfig = {
@@ -61,10 +64,7 @@ export const getProjectDocument = async (title: string): Promise<ProjectItem> =>
     .find((project) => project.title === title) as ProjectItem;
 };
 
-export const addTaskToDocument = async ({
-  projectId,
-  taskItem
-}: TaskItemAddedToProject) => {
+export const addTaskToDocument = async ({ projectId, taskItem }: TaskItemInProject) => {
   const projectDocRef = doc(collection(db, 'projects'), projectId);
   try {
     await updateDoc(projectDocRef, {
@@ -72,5 +72,44 @@ export const addTaskToDocument = async ({
     });
   } catch (error) {
     console.log('error adding task item to an array', error);
+  }
+};
+
+export const sortTaskInDocument = async ({
+  projectId,
+  taskItems
+}: TaskItemsInProject) => {
+
+  const projectDocRef = doc(collection(db, 'projects'), projectId);
+
+  try {
+    const docSnapshot = await getDoc(projectDocRef);
+
+    if (!docSnapshot.exists()) {
+      console.log('Document not found.');
+      return;
+    }
+
+    const projectData = docSnapshot.data() as ProjectItem;
+    
+    const index1 = projectData.tasks.findIndex((task) => task.id === taskItems[0].id);
+    const index2 = projectData.tasks.findIndex((task) => task.id === taskItems[1].id);
+
+    if (index1 === -1 || index2 === -1) {
+      console.log('One or both items not found.');
+      return;
+    }
+
+    [projectData.tasks[index1], projectData.tasks[index2]] = [
+      projectData.tasks[index2],
+      projectData.tasks[index1]
+    ];
+
+    await updateDoc(projectDocRef, {
+      tasks: projectData.tasks
+    });
+
+  } catch (error) {
+    console.error('Error swapping items in Firestore:', error);
   }
 };

@@ -7,8 +7,12 @@ import {
 import { ProjectItem, TaskItem } from '../projects/projects.types';
 import { PROJECT_ACTION_TYPES } from './project.types';
 
-export type TaskItemAddedToProject = {
+export type TaskItemInProject = {
   taskItem: TaskItem;
+  projectId: string;
+};
+export type TaskItemsInProject = {
+  taskItems: TaskItem[];
   projectId: string;
 };
 
@@ -29,7 +33,12 @@ export type FetchProjectFailed = ActionWithPayload<
 
 export type AddTaskStart = ActionWithPayload<
   PROJECT_ACTION_TYPES.ADD_TASK_START,
-  TaskItemAddedToProject
+  TaskItemInProject
+>;
+
+export type SortTaskStart = ActionWithPayload<
+  PROJECT_ACTION_TYPES.SORT_TASK_START,
+  TaskItemsInProject
 >;
 
 export type AddTaskSuccess = Action<PROJECT_ACTION_TYPES.ADD_TASK_SUCCESS>;
@@ -54,8 +63,13 @@ export const fetchProjectFailed = withMatcher(
     createAction(PROJECT_ACTION_TYPES.FETCH_PROJECT_FAILED, error)
 );
 export const addTaskStart = withMatcher(
-  (taskItemAddedToProject: TaskItemAddedToProject): AddTaskStart =>
+  (taskItemAddedToProject: TaskItemInProject): AddTaskStart =>
     createAction(PROJECT_ACTION_TYPES.ADD_TASK_START, taskItemAddedToProject)
+);
+
+export const sortTaskStart = withMatcher(
+  (taskItemsInProject: TaskItemsInProject): SortTaskStart =>
+    createAction(PROJECT_ACTION_TYPES.SORT_TASK_START, taskItemsInProject)
 );
 
 export const addTaskSuccess = withMatcher(
