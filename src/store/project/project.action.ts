@@ -4,7 +4,7 @@ import {
   createAction,
   withMatcher
 } from '../../utils/actions/actions.utils';
-import { ProjectItem, TaskItem } from '../projects/projects.types';
+import { ProjectItem, TASK_STATUS, TaskItem } from '../projects/projects.types';
 import { PROJECT_ACTION_TYPES } from './project.types';
 
 export type TaskItemInProject = {
@@ -36,9 +36,19 @@ export type AddTaskStart = ActionWithPayload<
   TaskItemInProject
 >;
 
+export type DeleteTaskStart = ActionWithPayload<
+  PROJECT_ACTION_TYPES.DELETE_TASK_START,
+  TaskItemInProject
+>;
+
 export type SortTaskStart = ActionWithPayload<
   PROJECT_ACTION_TYPES.SORT_TASK_START,
   TaskItemsInProject
+>;
+
+export type UpdateTaskStatusStart = ActionWithPayload<
+  PROJECT_ACTION_TYPES.UPDATE_TASK_STATUS_START,
+  TaskItemInProject & { status: TASK_STATUS }
 >;
 
 export type AddTaskSuccess = Action<PROJECT_ACTION_TYPES.ADD_TASK_SUCCESS>;
@@ -62,14 +72,30 @@ export const fetchProjectFailed = withMatcher(
   (error: Error): FetchProjectFailed =>
     createAction(PROJECT_ACTION_TYPES.FETCH_PROJECT_FAILED, error)
 );
+
 export const addTaskStart = withMatcher(
-  (taskItemAddedToProject: TaskItemInProject): AddTaskStart =>
-    createAction(PROJECT_ACTION_TYPES.ADD_TASK_START, taskItemAddedToProject)
+  (taskItemInProject: TaskItemInProject): AddTaskStart =>
+    createAction(PROJECT_ACTION_TYPES.ADD_TASK_START, taskItemInProject)
+);
+
+export const deleteTaskStart = withMatcher(
+  (taskItemInProject: TaskItemInProject): DeleteTaskStart =>
+    createAction(PROJECT_ACTION_TYPES.DELETE_TASK_START, taskItemInProject)
 );
 
 export const sortTaskStart = withMatcher(
   (taskItemsInProject: TaskItemsInProject): SortTaskStart =>
     createAction(PROJECT_ACTION_TYPES.SORT_TASK_START, taskItemsInProject)
+);
+
+export const updateTaskStatusStart = withMatcher(
+  (
+    taskItemWithNewStatusInProject: TaskItemInProject & { status: TASK_STATUS }
+  ): UpdateTaskStatusStart =>
+    createAction(
+      PROJECT_ACTION_TYPES.UPDATE_TASK_STATUS_START,
+      taskItemWithNewStatusInProject
+    )
 );
 
 export const addTaskSuccess = withMatcher(

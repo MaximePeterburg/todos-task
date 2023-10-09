@@ -6,10 +6,13 @@ import {
   TaskItemInProject,
   TaskItemsInProject,
   addTaskStart,
+  deleteTaskStart,
   fetchProjectStart,
-  sortTaskStart
+  sortTaskStart,
+  updateTaskStatusStart
 } from './project/project.action';
 import { fetchProjectsStart } from './projects/projects.action';
+import { TASK_STATUS } from './projects/projects.types';
 import { rootReducer } from './root-reducer';
 import { rootSaga } from './root-saga';
 
@@ -67,13 +70,20 @@ export const useStore = () => {
     project,
     projectIsLoading,
     tasks,
+
     fetchProjectStart: (title: string) => dispatch(fetchProjectStart(title)),
 
     addTaskStart: (taskAddedToProject: TaskItemInProject) =>
       dispatch(addTaskStart(taskAddedToProject)),
-    sortTaskStart: (taskItemsInProject: TaskItemsInProject) => {
-      console.log('sortTaskStart dispatched');
-      return dispatch(sortTaskStart(taskItemsInProject));
-    }
+
+    deleteTaskStart: (taskItemInProject: TaskItemInProject) =>
+      dispatch(deleteTaskStart(taskItemInProject)),
+
+    sortTaskStart: (taskItemsInProject: TaskItemsInProject) =>
+      dispatch(sortTaskStart(taskItemsInProject)),
+
+    updateTaskStatusStart: (
+      taskItemWithNewStatusInProject: TaskItemInProject & { status: TASK_STATUS }
+    ) => dispatch(updateTaskStatusStart(taskItemWithNewStatusInProject))
   };
 };

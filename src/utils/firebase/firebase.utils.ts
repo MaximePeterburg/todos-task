@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import {
+  arrayRemove,
   arrayUnion,
   collection,
   doc,
@@ -7,7 +8,6 @@ import {
   getDocs,
   getFirestore,
   query,
-  setDoc,
   updateDoc,
   writeBatch
 } from 'firebase/firestore';
@@ -15,7 +15,7 @@ import {
   TaskItemInProject,
   TaskItemsInProject
 } from '../../store/project/project.action';
-import { ProjectItem } from '../../store/projects/projects.types';
+import { ProjectItem, TASK_STATUS } from '../../store/projects/projects.types';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAp3LQgXIb2vPLjFmleCSZlOcR7hkcIboM',
@@ -75,11 +75,24 @@ export const addTaskToDocument = async ({ projectId, taskItem }: TaskItemInProje
   }
 };
 
+export const deleteTaskFromDocument = async ({
+  projectId,
+  taskItem
+}: TaskItemInProject) => {
+  const projectDocRef = doc(collection(db, 'projects'), projectId);
+  try {
+    await updateDoc(projectDocRef, {
+      tasks: arrayRemove(taskItem)
+    });
+  } catch (error) {
+    console.log('error deleting task item to an array', error);
+  }
+};
+
 export const sortTaskInDocument = async ({
   projectId,
   taskItems
 }: TaskItemsInProject) => {
-
   const projectDocRef = doc(collection(db, 'projects'), projectId);
 
   try {
@@ -91,7 +104,7 @@ export const sortTaskInDocument = async ({
     }
 
     const projectData = docSnapshot.data() as ProjectItem;
-    
+
     const index1 = projectData.tasks.findIndex((task) => task.id === taskItems[0].id);
     const index2 = projectData.tasks.findIndex((task) => task.id === taskItems[1].id);
 
@@ -100,16 +113,45 @@ export const sortTaskInDocument = async ({
       return;
     }
 
-    [projectData.tasks[index1], projectData.tasks[index2]] = [
-      projectData.tasks[index2],
-      projectData.tasks[index1]
-    ];
+    projectData.tasks.splice(index1, 1);
+    projectData.tasks.splice(index2, 0, taskItems[0]);
+
+    projectData.tasks[index2].status = projectData.tasks[index1].status;
 
     await updateDoc(projectDocRef, {
       tasks: projectData.tasks
     });
-
   } catch (error) {
     console.error('Error swapping items in Firestore:', error);
+  }
+};
+
+export const updateTaskStatusInDocument = async ({
+  projectId,
+  taskItem,
+  status
+}: TaskItemInProject & { status: TASK_STATUS }) => {
+  const projectDocRef = doc(collection(db, 'projects'), projectId);
+  try {
+    const docSnapshot = await getDoc(projectDocRef);
+
+    if (!docSnapshot.exists()) {
+      console.log('Document not found.');
+      return;
+    }
+
+    const projectData = docSnapshot.data() as ProjectItem;
+
+    taskItem.status = status;
+
+    const index = projectData.tasks.findIndex((item) => item.id === taskItem.id);
+
+    projectData.tasks[index] = taskItem;
+
+    await updateDoc(projectDocRef, {
+      tasks: projectData.tasks
+    });
+  } catch (error) {
+    console.error('Error updating status of item in Firestore:', error);
   }
 };

@@ -15,7 +15,11 @@ export enum TASK_STATUS {
   DEVELOPMENT = 'В работе',
   DONE = 'Завершено'
 }
-
+export const TASK_STATUS_DATA: TASK_STATUS[] = [
+  TASK_STATUS.QUEUE,
+  TASK_STATUS.DEVELOPMENT,
+  TASK_STATUS.DONE
+];
 export type ProjectItem = {
   title: string;
   description: string;
