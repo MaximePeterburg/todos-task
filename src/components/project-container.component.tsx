@@ -9,11 +9,10 @@ import {
   useSensors
 } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import css from 'styled-jsx/macro';
-import { TaskItemInProject, TaskItemsInProject } from '../store/project/project.action';
 import {
   TASK_STATUS,
   TASK_STATUS_DATA,
@@ -35,16 +34,11 @@ const ProjectContainer = () => {
 
   const { projectId } = useParams<keyof ProjectRouteParams>() as ProjectRouteParams;
 
-  const { sortTaskStart, updateTaskStatusStart, project } = useStore();
+  const { sortTaskStart, updateTaskStatusStart } = useStore();
 
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
 
   const [activeColumn, setActiveColumn] = useState<TASK_STATUS | null>(null);
-
-  const columnIds = useMemo(
-    () => TASK_STATUS_DATA.map((taskStatus) => taskStatus),
-    [project.tasks]
-  );
 
   useEffect(() => {
     fetchProjectStart(projectId);
